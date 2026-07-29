@@ -30,18 +30,15 @@ Confirmed working end-to-end on: Guitar Hero III: Legends of Rock, The Beatles: 
 
 ## Tools required
 
-- **NKit** (`ConvertToISO.exe` etc.) run via **Mono** (`mono ConvertToISO.exe ...`).
-  Needs a *populated* `NKit.dll.config` pointing at real `Dats/Redump/*/Redump.dat`
-  and `Recovery/` files — an NKit folder with an empty `Redump.dat` (0 entries) and
-  empty `Recovery/` folders will fail to identify/recover anything.
-
-  The distribution that has this populated is the one originally downloaded as
-  **"NKit 1.4 + Wii Partitions"** (a ~4GB archive bundling NKit itself together
-  with the Wii recovery/partition files), extracted locally to `~/Downloads/NKit 2`.
-  A separate bare "NKit" download (just the tools, no recovery data — found at
-  `~/Downloads/NKit`) turned out to be unnecessary — everything needed was
-  already in the "NKit 1.4 + Wii Partitions" bundle. If starting fresh, you
-  likely only need that one bundle, not a standalone NKit download.
+- **NKit + Wii partition recovery data** — get the **"NKit 1.4 + Wii Partitions"**
+  bundle from **https://vimm.net/vault/?p=nkit** (not bare NKit — this bundle
+  includes the Redump database and recovery files NKit needs to identify and
+  rebuild discs). Unzip the downloaded file, then `cd` into the resulting folder:
+  ```
+  unzip the-file.zip
+  cd the-uncompressed-folder
+  ```
+  Run the tools via **Mono**: `mono ConvertToISO.exe ...`
 
 - **wit / wit-thin** (Wiimms ISO Tools) — used for the final WBFS packaging,
   update-partition stripping, and FAT32 splitting.
@@ -59,14 +56,14 @@ Confirmed working end-to-end on: Guitar Hero III: Legends of Rock, The Beatles: 
   **[wit-mac-setup-guide.md](./wit-mac-setup-guide.md)** — read that first if
   `wit` won't run for you at all (e.g. silently killed, "zsh: killed", or a
   code-signing error). Once built, it accepts the same `copy`/`--wbfs`/
-  `--split`/`--psel` options used below.
-  Location used here: `~/Downloads/wit-v3.05a-r8638-mac/wit-thin`
-  (not on PATH — invoke with the full path, or `./wit-thin` from that directory).
+  `--split`/`--psel` options used below. It won't be on your PATH — invoke it
+  with the full path to wherever you extracted it, or `cd` there first and
+  run `./wit-thin`.
 
 ## Step 1 — Convert `.nkit.iso` to `.iso` with NKit
 
 ```
-cd ~/"Downloads/NKit 2"
+cd the-uncompressed-folder
 mono ConvertToISO.exe "/path/to/Game.nkit.iso"
 ```
 
@@ -109,7 +106,7 @@ but as a raw temp file — it does NOT get renamed/moved to its normal output
 location, because that also only happens on the success path. Find it here:
 
 ```
-~/Downloads/NKit 2/Processed/Temp/tmp########.tmp
+the-uncompressed-folder/Processed/Temp/tmp########.tmp
 ```
 
 ...and move/rename it yourself to a proper `.iso` filename.
@@ -131,7 +128,7 @@ trying to carry a broken one.
 ## Step 2 — Convert `.iso` to split `.wbfs` with wit-thin, stripping the update partition
 
 ```
-~/Downloads/wit-v3.05a-r8638-mac/wit-thin copy --wbfs --split --psel=data \
+wit-thin copy --wbfs --split --psel=data \
   "/path/to/Game.iso" \
   "~/Wii Game Roms/wbfs"
 ```
@@ -155,8 +152,8 @@ USB Loader GX / WiiFlow convention.
 Cross-check against local databases before trusting a folder/file name blindly:
 
 ```
-grep -i "<game title>" "~/Downloads/NKit 2/Dats/GameTdb/wiitdb.txt"
-grep -i -B2 -A2 "<game title>" "~/Downloads/NKit 2/Dats/Redump/Wii/Redump.dat"
+grep -i "<game title>" "the-uncompressed-folder/Dats/GameTdb/wiitdb.txt"
+grep -i -B2 -A2 "<game title>" "the-uncompressed-folder/Dats/Redump/Wii/Redump.dat"
 ```
 
 And/or check the ID is actually embedded in the produced file itself:
