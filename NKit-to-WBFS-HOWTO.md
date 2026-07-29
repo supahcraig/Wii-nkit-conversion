@@ -1,5 +1,27 @@
 # NKit .nkit.iso → playable ISO / WBFS — working process
 
+## The core issue, in short
+
+A `.nkit.iso` is NKit's shrunk, preservation-oriented format for Wii discs —
+it's not directly playable/bootable, it has to be reconstructed back into a
+real ISO first. Most `.nkit.iso` files also have their Wii **system update
+partition** (Nintendo's disc-embedded OS updater, not game content) stripped
+out entirely to save space. Rebuilding that partition byte-for-byte requires
+recovery data that NKit does not distribute (it's Nintendo's copyrighted
+software) and that a fresh install won't have, so NKit's own verification step
+correctly detects it *can't* rebuild an exact original — and its default
+behavior is to just delete the output rather than hand you an "unverified"
+file, even though the game itself converted perfectly fine. We got around
+this by (1) using an NKit distribution with a populated recovery/database set
+for correct game identification, (2) flipping an undocumented debug setting so
+NKit keeps the unverified output instead of deleting it, and (3) using `wit`
+to explicitly drop the now-unrecoverable (filler-filled, invalid) update
+partition when packaging to WBFS — which is also *required* for real Wii
+hardware to accept the disc at all, since real hardware/`wit` reject a
+present-but-invalid update partition even though Dolphin doesn't care. The
+result is a fully game-complete, real-hardware-bootable backup; the only
+thing missing is Nintendo's update installer, which the game doesn't need.
+
 This documents the exact, verified-working process for converting a `.nkit.iso`
 (Wii, scrubbed/compressed NKit format) into a real ISO and then into a
 split `.wbfs` that USB Loader GX will actually list and boot on real hardware.
@@ -11,10 +33,33 @@ Confirmed working end-to-end on: Guitar Hero III: Legends of Rock, The Beatles: 
 - **NKit** (`ConvertToISO.exe` etc.) run via **Mono** (`mono ConvertToISO.exe ...`).
   Needs a *populated* `NKit.dll.config` pointing at real `Dats/Redump/*/Redump.dat`
   and `Recovery/` files — an NKit folder with an empty `Redump.dat` (0 entries) and
-  empty `Recovery/` folders will fail to identify/recover anything. In this setup
-  the good copy is at `~/Downloads/NKit 2`.
-- **wit-thin** (Wiimms ISO Tools, thin/no-progress-bar build) — used for the final
-  WBFS packaging + update-partition stripping + FAT32 splitting.
+  empty `Recovery/` folders will fail to identify/recover anything.
+
+  The distribution that has this populated is the one originally downloaded as
+  **"NKit 1.4 + Wii Partitions"** (a ~4GB archive bundling NKit itself together
+  with the Wii recovery/partition files), extracted locally to `~/Downloads/NKit 2`.
+  A separate bare "NKit" download (just the tools, no recovery data — found at
+  `~/Downloads/NKit`) turned out to be unnecessary — everything needed was
+  already in the "NKit 1.4 + Wii Partitions" bundle. If starting fresh, you
+  likely only need that one bundle, not a standalone NKit download.
+
+- **wit / wit-thin** (Wiimms ISO Tools) — used for the final WBFS packaging,
+  update-partition stripping, and FAT32 splitting.
+
+  Get the official tools from **https://wit.wiimm.de/** (download page links
+  to Windows/Mac/Linux builds). The build used here was **`wit-v3.05a-r8638-mac`**.
+
+  `wit-thin` is **not** an official pre-built variant — on Apple Silicon Macs,
+  the official universal binary (`bin/wit`) can get killed outright by
+  Gatekeeper/code-signing checks before it even runs. The fix is to extract
+  just your Mac's own architecture slice with `lipo -thin` and apply a fresh
+  local ad-hoc signature — producing a binary literally named `wit-thin` for
+  that reason. Full step-by-step build instructions, troubleshooting, and
+  day-to-day usage are in
+  **[wit-mac-setup-guide.md](./wit-mac-setup-guide.md)** — read that first if
+  `wit` won't run for you at all (e.g. silently killed, "zsh: killed", or a
+  code-signing error). Once built, it accepts the same `copy`/`--wbfs`/
+  `--split`/`--psel` options used below.
   Location used here: `~/Downloads/wit-v3.05a-r8638-mac/wit-thin`
   (not on PATH — invoke with the full path, or `./wit-thin` from that directory).
 
@@ -161,7 +206,7 @@ simply fail to appear in the carousel. Fixes, easiest first:
 
 ```
 Game.nkit.iso
-   │  mono ConvertToISO.exe   (NKit 2, OutputLevel=3)
+   │  mono ConvertToISO.exe   ("NKit 1.4 + Wii Partitions" bundle, OutputLevel=3)
    ▼
 Game.iso                       (update partition = filler, plays in Dolphin)
    │  wit-thin copy --wbfs --split --psel=data
