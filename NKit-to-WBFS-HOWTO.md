@@ -33,12 +33,12 @@ Confirmed working end-to-end on: Guitar Hero III: Legends of Rock, The Beatles: 
 - **NKit + Wii partition recovery data** — get the **"NKit 1.4 + Wii Partitions"**
   bundle from **https://vimm.net/vault/?p=nkit** (not bare NKit — this bundle
   includes the Redump database and recovery files NKit needs to identify and
-  rebuild discs). Unzip the downloaded file, then `cd` into the resulting folder:
+  rebuild discs). It downloads as `NKit 1.4 + Wii Partitions.7z`; unzip it —
+  it extracts into a folder named `NKit`. `cd` into that folder to run the tools:
   ```
-  unzip the-file.zip
-  cd the-uncompressed-folder
+  cd NKit
+  mono ConvertToISO.exe ...
   ```
-  Run the tools via **Mono**: `mono ConvertToISO.exe ...`
 
 - **wit / wit-thin** (Wiimms ISO Tools) — used for the final WBFS packaging,
   update-partition stripping, and FAT32 splitting.
@@ -63,7 +63,7 @@ Confirmed working end-to-end on: Guitar Hero III: Legends of Rock, The Beatles: 
 ## Step 1 — Convert `.nkit.iso` to `.iso` with NKit
 
 ```
-cd the-uncompressed-folder
+cd NKit
 mono ConvertToISO.exe "/path/to/Game.nkit.iso"
 ```
 
@@ -106,7 +106,7 @@ but as a raw temp file — it does NOT get renamed/moved to its normal output
 location, because that also only happens on the success path. Find it here:
 
 ```
-the-uncompressed-folder/Processed/Temp/tmp########.tmp
+NKit/Processed/Temp/tmp########.tmp
 ```
 
 ...and move/rename it yourself to a proper `.iso` filename.
@@ -152,8 +152,8 @@ USB Loader GX / WiiFlow convention.
 Cross-check against local databases before trusting a folder/file name blindly:
 
 ```
-grep -i "<game title>" "the-uncompressed-folder/Dats/GameTdb/wiitdb.txt"
-grep -i -B2 -A2 "<game title>" "the-uncompressed-folder/Dats/Redump/Wii/Redump.dat"
+grep -i "<game title>" "NKit/Dats/GameTdb/wiitdb.txt"
+grep -i -B2 -A2 "<game title>" "NKit/Dats/Redump/Wii/Redump.dat"
 ```
 
 And/or check the ID is actually embedded in the produced file itself:
