@@ -16,17 +16,28 @@ real ISO first. That reconstruction runs into one recurring snag:
   original — and by default just **deletes the output** rather than hand you
   an "unverified" file, even though the actual game data converted fine.
 
-How we got around it:
+Important nuance: getting the **"NKit 1.4 + Wii Partitions"** bundle does
+*not* mean you'll actually have the specific recovery data for your game's
+missing update partition. That bundle's `Recovery/NkitExtracted/Wii/` folder
+— where the actual per-title update-partition data would live — was empty on
+a fresh setup, and stayed empty for every title tested here. **We never
+obtained or used real update-partition recovery data for any game.** What
+that bundle *does* reliably provide, and what we actually needed, is its
+populated **Redump database** — without it, NKit can't even identify the
+game (title, ID, correct naming). The missing-partition problem itself we
+solved by bypassing it entirely, not by recovering it:
 
-1. Use an NKit distribution with a populated recovery/database set, for
-   correct game identification.
-2. Flip an undocumented debug setting so NKit keeps the unverified output
-   instead of deleting it.
+1. Use an NKit distribution with a populated Redump database, so NKit can
+   correctly identify the game (title/ID) — this is the part of the "Wii
+   Partitions" bundle that's actually load-bearing here.
+2. Flip an undocumented debug setting so NKit keeps its output instead of
+   deleting it when it can't verify a byte-perfect rebuild (which it never
+   can, absent real recovery data).
 3. Use `wit` to explicitly drop that now-unrecoverable (filler-filled,
-   invalid) update partition when packaging to WBFS — which is also
-   *required* for real Wii hardware to accept the disc at all, since real
-   hardware/`wit` reject a present-but-invalid update partition even though
-   Dolphin doesn't care.
+   invalid) update partition when packaging to WBFS, rather than trying to
+   ship a broken one — which is also *required* for real Wii hardware to
+   accept the disc at all, since real hardware/`wit` reject a
+   present-but-invalid update partition even though Dolphin doesn't care.
 
 End result: a fully game-complete, real-hardware-bootable backup. The only
 thing missing is Nintendo's update installer, which the game doesn't need.
