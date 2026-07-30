@@ -16,20 +16,20 @@ real ISO first. That reconstruction runs into one recurring snag:
   original — and by default just **deletes the output** rather than hand you
   an "unverified" file, even though the actual game data converted fine.
 
-Important nuance: getting the **"NKit 1.4 + Wii Partitions"** bundle does
-*not* mean you'll actually have the specific recovery data for your game's
-missing update partition. That bundle's `Recovery/NkitExtracted/Wii/` folder
-— where the actual per-title update-partition data would live — was empty on
-a fresh setup, and stayed empty for every title tested here. **We never
-obtained or used real update-partition recovery data for any game.** What
-that bundle *does* reliably provide, and what we actually needed, is its
-populated **Redump database** — without it, NKit can't even identify the
-game (title, ID, correct naming). The missing-partition problem itself we
-solved by bypassing it entirely, not by recovering it:
+Important nuance: no NKit distribution we tried — including ones bundled
+with extra "recovery" data — actually had real recovery data for a Wii
+game's missing update partition. `Recovery/NkitExtracted/Wii/`, where that
+per-title data would live, was empty in every copy checked, Wii-side, with
+one such bundle's 2,226 "extra" recovery files turning out to be 100%
+GameCube-only. **We never obtained or used real update-partition recovery
+data for any Wii game.** What actually matters, if you want NKit to
+auto-identify a game (title, ID, correct naming) for you, is just its
+populated **Redump database** — but that's optional if you already know the
+game's ID yourself. The missing-partition problem itself we solved by
+bypassing it entirely, not by recovering it:
 
-1. Use an NKit distribution with a populated Redump database, so NKit can
-   correctly identify the game (title/ID) — this is the part of the "Wii
-   Partitions" bundle that's actually load-bearing here.
+1. (Optional) Use an NKit copy with a populated Redump database, so NKit can
+   auto-identify the game (title/ID) — skip this if you already know the ID.
 2. Flip an undocumented debug setting so NKit keeps its output instead of
    deleting it when it can't verify a byte-perfect rebuild (which it never
    can, absent real recovery data).
@@ -56,12 +56,15 @@ Confirmed working end-to-end on: Guitar Hero III: Legends of Rock, The Beatles: 
   brew install mono
   ```
 
-- **NKit + Wii partition recovery data** — get the **"NKit 1.4 + Wii Partitions"**
-  bundle from **https://vimm.net/vault/?p=nkit** (not bare NKit — this bundle
-  includes the Redump database and recovery files NKit needs to identify and
-  rebuild discs). It downloads as `NKit 1.4 + Wii Partitions.7z`; unzip it —
-  it extracts into a folder named `NKit`. `cd` into that folder to run the tools:
+- **NKit** — get it from
+  **https://github.com/emukidid/swiss-gc/releases** (look for the latest
+  `NKit_v1.4.<date>.zip` asset). This includes NKit's tools plus a populated
+  Redump database (useful for auto-identifying games, but not required if
+  you already know your game's ID — see the nuance above). It's a flat zip
+  with no wrapping folder, so extract it into a folder of your own choosing:
   ```
+  mkdir NKit
+  unzip NKit_v1.4.<date>.zip -d NKit
   cd NKit
   mono ConvertToISO.exe ...
   ```
@@ -232,7 +235,7 @@ simply fail to appear in the carousel. Fixes, easiest first:
 
 ```
 Game.nkit.iso
-   │  mono ConvertToISO.exe   ("NKit 1.4 + Wii Partitions" bundle, OutputLevel=3)
+   │  mono ConvertToISO.exe   (OutputLevel=3)
    ▼
 Game.iso                       (update partition = filler, plays in Dolphin)
    │  wit-thin copy --wbfs --split --psel=data
