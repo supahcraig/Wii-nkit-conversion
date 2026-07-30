@@ -120,7 +120,9 @@ NKit source, `Converter.cs`), **not** controlled by the documented `FullVerify`
 or `RecoveryMatchFailDelete` config keys — those do nothing here.
 
 The undocumented fix: set `OutputLevel` to `3` (an undocumented "Debug" level;
-the config comment only documents 0–2) in `NKit.dll.config`:
+the config comment only documents 0–2) in `NKit/NKit.dll.config`
+(that's the config file sitting directly in the `NKit` folder you extracted
+earlier, alongside `ConvertToISO.exe`):
 
 ```xml
 <add key="OutputLevel" value="3"/>
@@ -156,7 +158,7 @@ trying to carry a broken one.
 ```
 wit-thin copy --wbfs --split --psel=data \
   "/path/to/Game.iso" \
-  "~/Wii Game Roms/wbfs"
+  "/path/to/wbfs"
 ```
 
 - `--wbfs` — output format
@@ -195,7 +197,7 @@ Copy the whole per-game folder (all split parts together, same base filename)
 straight into the SD card's `wbfs/` directory:
 
 ```
-cp -R "~/Wii Game Roms/wbfs/<Title> [<ID6>]" "/Volumes/<SDCARD>/wbfs/"
+cp -R "/path/to/wbfs/<Title> [<ID6>]" "/Volumes/<SDCARD>/wbfs/"
 ```
 
 Split parts (`.wbfs`, `.wbf1`, `.wbf2`...) must:
