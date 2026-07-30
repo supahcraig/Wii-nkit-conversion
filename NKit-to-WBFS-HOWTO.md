@@ -137,7 +137,8 @@ location, because that also only happens on the success path. Find it here:
 NKit/Processed/Temp/tmp########.tmp
 ```
 
-...and move/rename it yourself to a proper `.iso` filename.
+...and move/rename it yourself to a proper `.iso` filename, e.g.
+`/path/to/Game.iso` — that's the file Step 2 below uses as its input.
 
 **Practical effect of the filler partition**: the resulting ISO plays fine in
 Dolphin, and is fine for real hardware *once the update partition is stripped
