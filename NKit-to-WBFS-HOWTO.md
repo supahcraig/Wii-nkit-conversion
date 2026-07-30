@@ -3,23 +3,32 @@
 ## The core issue, in short
 
 A `.nkit.iso` is NKit's shrunk, preservation-oriented format for Wii discs —
-it's not directly playable/bootable, it has to be reconstructed back into a
-real ISO first. Most `.nkit.iso` files also have their Wii **system update
-partition** (Nintendo's disc-embedded OS updater, not game content) stripped
-out entirely to save space. Rebuilding that partition byte-for-byte requires
-recovery data that NKit does not distribute (it's Nintendo's copyrighted
-software) and that a fresh install won't have, so NKit's own verification step
-correctly detects it *can't* rebuild an exact original — and its default
-behavior is to just delete the output rather than hand you an "unverified"
-file, even though the game itself converted perfectly fine. We got around
-this by (1) using an NKit distribution with a populated recovery/database set
-for correct game identification, (2) flipping an undocumented debug setting so
-NKit keeps the unverified output instead of deleting it, and (3) using `wit`
-to explicitly drop the now-unrecoverable (filler-filled, invalid) update
-partition when packaging to WBFS — which is also *required* for real Wii
-hardware to accept the disc at all, since real hardware/`wit` reject a
-present-but-invalid update partition even though Dolphin doesn't care. The
-result is a fully game-complete, real-hardware-bootable backup; the only
+it's not directly playable/bootable; it has to be reconstructed back into a
+real ISO first. That reconstruction runs into one recurring snag:
+
+- Most `.nkit.iso` files have their Wii **system update partition**
+  (Nintendo's disc-embedded OS updater, not game content) stripped out
+  entirely to save space.
+- Rebuilding that partition byte-for-byte needs recovery data NKit doesn't
+  distribute (it's Nintendo's copyrighted software), so a fresh install won't
+  have it.
+- NKit's own verification step correctly notices it can't rebuild an exact
+  original — and by default just **deletes the output** rather than hand you
+  an "unverified" file, even though the actual game data converted fine.
+
+How we got around it:
+
+1. Use an NKit distribution with a populated recovery/database set, for
+   correct game identification.
+2. Flip an undocumented debug setting so NKit keeps the unverified output
+   instead of deleting it.
+3. Use `wit` to explicitly drop that now-unrecoverable (filler-filled,
+   invalid) update partition when packaging to WBFS — which is also
+   *required* for real Wii hardware to accept the disc at all, since real
+   hardware/`wit` reject a present-but-invalid update partition even though
+   Dolphin doesn't care.
+
+End result: a fully game-complete, real-hardware-bootable backup. The only
 thing missing is Nintendo's update installer, which the game doesn't need.
 
 This documents the exact, verified-working process for converting a `.nkit.iso`
@@ -29,6 +38,12 @@ split `.wbfs` that USB Loader GX will actually list and boot on real hardware.
 Confirmed working end-to-end on: Guitar Hero III: Legends of Rock, The Beatles: Rock Band.
 
 ## Tools required
+
+- **Mono** — required to run NKit's `.exe` tools on Mac/Linux (they're .NET
+  binaries). Not installed on macOS by default:
+  ```
+  brew install mono
+  ```
 
 - **NKit + Wii partition recovery data** — get the **"NKit 1.4 + Wii Partitions"**
   bundle from **https://vimm.net/vault/?p=nkit** (not bare NKit — this bundle
