@@ -74,7 +74,9 @@ Confirmed working end-to-end on: Guitar Hero III: Legends of Rock, The Beatles: 
   also keeps a **backup snapshot** — binaries only, no `Dats/`, MIT license
   included — under [`NKit/`](./NKit/). It's a fallback, not the primary
   recommendation; prefer the link above when it's reachable, since it tracks
-  ongoing NKit updates and this snapshot won't.
+  ongoing NKit updates and this snapshot won't. If both of those are
+  unreachable, NKit's source is on GitHub and can be built directly — see
+  [building-nkit-from-source.md](./building-nkit-from-source.md).
 
 - **wit / wit-thin** (Wiimms ISO Tools) — used for the final WBFS packaging,
   update-partition stripping, and FAT32 splitting.
