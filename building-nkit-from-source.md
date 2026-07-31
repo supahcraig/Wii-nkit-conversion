@@ -5,11 +5,29 @@ This is a fallback path, not the primary recommendation — see the main
 NKit (a pre-built zip). Build from source if every pre-built source is
 unreachable, or you specifically want to inspect/modify NKit's behavior.
 
-**Heads up**: the source repo (`Nanook/NKitv1` on GitHub) is a few years
-behind what's actually distributed as pre-built binaries. Building it
-produces a working `v1.3` — the swiss-gc/vimm.net zips are `v1.4`. Same core
-behavior (including the `OutputLevel=3` fix documented in the main HOWTO),
-just an older revision.
+## ⚠️ There are TWO different "NKit" repos by the same author — do not confuse them
+
+- **[`Nanook/NKitv1`](https://github.com/Nanook/NKitv1)** — the OLD tool.
+  Separate `.exe` per task (`ConvertToISO.exe`, `ConvertToNKit.exe`, etc.),
+  banner reads `"ConvertToISO vX.X, NKit.dll vX.X :: Nanook"`. **This is what
+  the main HOWTO uses, and what this guide builds.** Builds with Mono, no
+  `dotnet` needed. Currently tagged `1.3` in this repo — a few versions
+  behind the `1.4` distributed as pre-built binaries (swiss-gc/vimm.net),
+  but same core behavior (including the `OutputLevel=3` fix).
+
+- **[`Nanook/NKit`](https://github.com/Nanook/NKit)** — a completely
+  different, unrelated rewrite the author calls **"NKit 2"**. One unified
+  binary with a different CLI (`nkit -task convert ...`), **requires the
+  `dotnet` 6 runtime**, and is **not compatible** with anything in the main
+  HOWTO — it doesn't produce `ConvertToISO.exe` or anything like it.
+
+**If you installed `dotnet` 6 trying to build NKit, you were building the
+wrong one for this pipeline.** This guide is entirely about `NKitv1`.
+There's also no public source exactly matching the `1.4` binaries
+themselves — Nanook ships those as compiled binaries only (via swiss-gc,
+vimm.net, etc.), without a matching public tag/release on `NKitv1`. Building
+`NKitv1` gets you the newest version whose *source* is public, `1.3`, not a
+perfect match for `1.4`.
 
 ## Dependencies
 
