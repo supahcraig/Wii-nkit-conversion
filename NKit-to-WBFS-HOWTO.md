@@ -56,18 +56,25 @@ Confirmed working end-to-end on: Guitar Hero III: Legends of Rock, The Beatles: 
   brew install mono
   ```
 
-- **NKit** — get it from
+- **NKit** — get the latest copy from
   **https://github.com/emukidid/swiss-gc/releases** (look for the latest
-  `NKit_v1.4.<date>.zip` asset). This includes NKit's tools plus a populated
-  Redump database (useful for auto-identifying games, but not required if
-  you already know your game's ID — see the nuance above). It's a flat zip
-  with no wrapping folder, so extract it into a folder of your own choosing:
+  `NKit_v1.4.<date>.zip` asset) — that's the actively-updated source, and
+  includes a populated Redump database (useful for auto-identifying games,
+  but not required if you already know your game's ID — see the nuance
+  above). It's a flat zip with no wrapping folder, so extract it into a
+  folder of your own choosing:
   ```
   mkdir NKit
   unzip NKit_v1.4.<date>.zip -d NKit
   cd NKit
   mono ConvertToISO.exe ...
   ```
+
+  If that source ever goes offline (not uncommon in this scene), this repo
+  also keeps a **backup snapshot** — binaries only, no `Dats/`, MIT license
+  included — under [`NKit/`](./NKit/). It's a fallback, not the primary
+  recommendation; prefer the link above when it's reachable, since it tracks
+  ongoing NKit updates and this snapshot won't.
 
 - **wit / wit-thin** (Wiimms ISO Tools) — used for the final WBFS packaging,
   update-partition stripping, and FAT32 splitting.
@@ -181,12 +188,17 @@ USB Loader GX / WiiFlow convention.
 
 ## Step 3 — Verify the game ID (don't just trust the folder name)
 
-Cross-check against local databases before trusting a folder/file name blindly:
+If your NKit copy includes `Dats/` (the full swiss-gc zip does; a trimmed
+copy may not), cross-check against those local databases:
 
 ```
 grep -i "<game title>" "NKit/Dats/GameTdb/wiitdb.txt"
 grep -i -B2 -A2 "<game title>" "NKit/Dats/Redump/Wii/Redump.dat"
 ```
+
+No `Dats/` folder? Check online instead — search the title on
+**https://www.gametdb.com/** (Wii section) or **https://redump.org/** to
+confirm its ID.
 
 And/or check the ID is actually embedded in the produced file itself:
 
